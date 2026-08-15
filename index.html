@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Name — Game Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Desktop sidebar -->
+  <aside class="sidebar">
+    <div class="logo">&lt;/&gt;</div>
+    <nav>
+      <a class="navlink active" data-target="home" href="#home">Home</a>
+      <a class="navlink" data-target="skills" href="#skills">Skills</a>
+      <a class="navlink" data-target="projects" href="#projects">Projects</a>
+      <a class="navlink" data-target="log" href="#log">Log</a>
+      <a class="navlink" data-target="contact" href="#contact">Contact</a>
+    </nav>
+    <div class="foot-mark">v1.0</div>
+  </aside>
+
+  <!-- Mobile topbar -->
+  <div class="topbar">
+    <div class="logo">&lt;/&gt;</div>
+    <nav>
+      <a class="navlink active" data-target="home" href="#home">Home</a>
+      <a class="navlink" data-target="skills" href="#skills">Skills</a>
+      <a class="navlink" data-target="projects" href="#projects">Projects</a>
+      <a class="navlink" data-target="log" href="#log">Log</a>
+      <a class="navlink" data-target="contact" href="#contact">Contact</a>
+    </nav>
+  </div>
+
+  <main>
+
+    <!-- HERO -->
+    <section id="home">
+      <div class="section-inner hero-grid">
+        <div class="hero">
+          <div class="eyebrow">Build: Portfolio_v1.0 // Status: Playable</div>
+          <h1>Systems that move.<br>Worlds that <span class="accent">react.</span></h1>
+          <p class="lead">I'm <strong>Your Name</strong>, a Unity &amp; Unreal developer. I build gameplay systems, enemy AI, combat feel, and vehicle physics — from empty scene to shippable build.</p>
+          <div class="btn-row">
+            <a href="#projects" class="btn btn-primary">View Projects</a>
+            <a href="#" class="btn btn-ghost">Download Resume</a>
+            <a href="#contact" class="btn btn-ghost">Get In Touch</a>
+          </div>
+        </div>
+
+        <div class="viewport" id="viewport">
+          <div class="vp-corner tl"></div>
+          <div class="vp-corner tr"></div>
+          <div class="vp-corner bl"></div>
+          <div class="vp-corner br"></div>
+          <div class="vp-hud top-left">SCENE: Portfolio.unity<br><span class="dim">CAM: Perspective</span></div>
+          <div class="vp-hud top-right" id="hud-stats">OBJ: 04<br>TRIS: 12.8K<br>FPS: 60</div>
+          <div class="vp-drag-hint">drag to orbit</div>
+          <div class="vp-scanline"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <div class="section-inner">
+        <div class="eyebrow">Inspector // Components</div>
+        <h2>Core Skillset</h2>
+
+        <div class="skills-grid">
+          <div class="skill-card"><div class="grp">Engine</div><h3>Unity</h3></div>
+          <div class="skill-card"><div class="grp">Engine</div><h3>Unreal Engine</h3></div>
+          <div class="skill-card"><div class="grp">Language</div><h3>C#</h3></div>
+          <div class="skill-card"><div class="grp">Language</div><h3>C++</h3></div>
+          <div class="skill-card"><div class="grp">Visual Scripting</div><h3>Blueprints</h3></div>
+          <div class="skill-card"><div class="grp">Gameplay</div><h3>AI &amp; Behavior Trees</h3></div>
+          <div class="skill-card"><div class="grp">Gameplay</div><h3>Combat &amp; Animation</h3></div>
+          <div class="skill-card"><div class="grp">Gameplay</div><h3>Vehicle &amp; Physics</h3></div>
+          <div class="skill-card"><div class="grp">Systems</div><h3>Player Customization / UI</h3></div>
+          <div class="skill-card"><div class="grp">Systems</div><h3>Prefab Architecture</h3></div>
+          <div class="skill-card"><div class="grp">Craft</div><h3>Level Design</h3></div>
+          <div class="skill-card"><div class="grp">Craft</div><h3>Particles &amp; VFX</h3></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+      <div class="section-inner">
+        <div class="eyebrow">Scenes // Loaded</div>
+        <h2>Selected Projects</h2>
+
+        <div class="project-grid">
+
+          <div class="project-card">
+            <div class="thumb thumb-horror">
+              <span class="badge engine">Unreal Engine</span>
+            </div>
+            <div class="project-body">
+              <h3>Survival Horror</h3>
+              <p>An AI-driven horror experience — enemy detection, dynamic chase sequences, and a full combat and health system built around tension and pacing.</p>
+              <div class="tag-row">
+                <span class="tag">AI Behavior</span>
+                <span class="tag">Detection</span>
+                <span class="tag">Combat</span>
+                <span class="tag">Health System</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="thumb thumb-kart">
+              <span class="badge engine">Unity</span>
+            </div>
+            <div class="project-body">
+              <h3>Kart Racer</h3>
+              <p>An arcade-style kart racing game built from the ground up — custom vehicle physics, drift mechanics, and movement tuned for responsive, satisfying handling.</p>
+              <div class="tag-row">
+                <span class="tag">Vehicle Physics</span>
+                <span class="tag">Drift Mechanics</span>
+                <span class="tag">Movement</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="thumb thumb-fighter">
+              <span class="badge engine">Unreal Engine</span>
+            </div>
+            <div class="project-body">
+              <h3>Jodu The Fighter</h3>
+              <p>A combat-focused fighting game prototype with combo-driven attacks and hand-tuned animation blending for readable, impactful hits.</p>
+              <div class="tag-row">
+                <span class="tag">Combat Design</span>
+                <span class="tag">Animation</span>
+                <span class="tag">Hit Reactions</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="thumb thumb-inprogress">
+              <span class="badge dev">In Development</span>
+            </div>
+            <div class="project-body">
+              <h3>Untitled Unity Project</h3>
+              <p>A larger solo-built Unity project — player movement, collisions, level design, prefab architecture, and a full player customization system with unlockable skins and gear.</p>
+              <div class="tag-row">
+                <span class="tag">Customization / UI</span>
+                <span class="tag">Prefabs</span>
+                <span class="tag">C# Systems</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- BUILD LOG -->
+    <section id="log">
+      <div class="section-inner">
+        <div class="eyebrow">Build Log // Chronological</div>
+        <h2>Path So Far</h2>
+
+        <div class="log">
+          <div class="log-entry">
+            <span class="log-tag mono">v1.0</span>
+            <h3>BCom in Computer Applications</h3>
+            <p>Completed a Bachelor of Commerce with a focus in Computer Applications.</p>
+          </div>
+          <div class="log-entry">
+            <span class="log-tag mono">v1.1</span>
+            <h3>Game Developer Diploma (1 year)</h3>
+            <p>Trained in Unity/C# and Unreal Engine (Blueprints + C++) game development.</p>
+          </div>
+          <div class="log-entry">
+            <span class="log-tag mono">v1.2</span>
+            <h3>Shipped 3 portfolio projects</h3>
+            <p>Survival Horror, Kart Racer, and Jodu The Fighter — built end-to-end.</p>
+          </div>
+          <div class="log-entry">
+            <span class="log-tag mono">v1.3</span>
+            <h3>Started a larger solo Unity project</h3>
+            <p>Building every system from scratch: movement, collisions, level design, UI, and customization.</p>
+          </div>
+          <div class="log-entry">
+            <span class="log-tag mono">v1.4</span>
+            <h3>Currently leveling up</h3>
+            <p>Taking a Unity Engine course to deepen engine-level knowledge.</p>
+          </div>
+          <div class="log-entry">
+            <span class="log-tag mono">v1.5</span>
+            <h3>Core Game Developer Intern — offer received</h3>
+            <p>Remote Unity/C# internship on <em>Temple of Causality: Reincarnation</em>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="section-inner">
+        <div class="eyebrow">Export Build</div>
+        <h2>Let's Build Something</h2>
+        <p style="color:var(--text-muted);margin-top:.8rem;max-width:52ch;">Open to internships, freelance work, and full-time Unity/Unreal roles. Send a message and I'll get back to you.</p>
+
+        <div class="contact-grid">
+          <form onsubmit="return false;">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" type="text" placeholder="Your name">
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" placeholder="you@example.com">
+            </div>
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" rows="5" placeholder="Tell me about the project or role..."></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Send Message</button>
+          </form>
+
+          <div class="links-panel">
+            <div class="eyebrow">Direct Links</div>
+            <a class="link-item" href="#" target="_blank"><span>GitHub</span><span class="arrow">&rarr;</span></a>
+            <a class="link-item" href="#" target="_blank"><span>LinkedIn</span><span class="arrow">&rarr;</span></a>
+            <a class="link-item" href="mailto:you@example.com"><span>Email</span><span class="arrow">&rarr;</span></a>
+            <a class="link-item" href="#" target="_blank"><span>Resume (PDF)</span><span class="arrow">&rarr;</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <span>© 2026 Your Name — All systems operational.</span>
+  <span>Compiled with: HTML · CSS · JS · Three.js</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
