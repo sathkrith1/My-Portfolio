@@ -158,10 +158,32 @@
     margin-bottom:1.4rem;
   }
   .hero h1 .accent{color:var(--accent);}
+  .role-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.6rem;
+    margin-bottom:1.3rem;
+  }
+  .role-chip{
+    font-family:var(--font-mono);
+    font-size:.68rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--accent);
+    border:1px solid var(--accent-dim);
+    background:rgba(124,242,156,.06);
+    padding:.32rem .7rem;
+    border-radius:3px;
+  }
   .hero p.lead{
     color:var(--text-muted);
     font-size:1.05rem;
     max-width:46ch;
+    margin-bottom:1.1rem;
+  }
+  .meta-row{
+    font-size:.76rem;
+    color:var(--text-muted);
     margin-bottom:2.2rem;
   }
   .btn-row{display:flex;gap:1rem;flex-wrap:wrap;}

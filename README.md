@@ -7,21 +7,24 @@ A personal portfolio site to showcase Unity/Unreal projects, skills, and experie
 - `index.html` — page structure/content
 - `style.css` — all styling
 - `script.js` — nav scroll-tracking, HUD animation, and the 3D viewport scene
+- `resume.pdf` — downloadable resume, linked from the hero button and Direct Links panel
 
 ## Status
 
-Name, GitHub, LinkedIn, and email are already filled in. Still pending:
+Name, GitHub, LinkedIn, email, phone, and resume are filled in. Still pending:
 
-- **Resume PDF** — the "Resume (Coming Soon)" links (hero button + Direct Links panel) are placeholders until you have an updated resume to link to
+- Replace `resume.pdf` with a newer version whenever you update it (keep the filename the same, or update the `href="resume.pdf"` links in `index.html` if you rename it)
 - Project descriptions/tags — add screenshots, gameplay clips, or GitHub/itch.io links per project if you want them
+
+**Note:** if GitHub/LinkedIn links didn't open before, it was because an earlier download still had placeholder `#` links — this version has the real URLs wired in.
 
 ## Publish on GitHub Pages
 
 1. Create a new repository on GitHub (e.g. `portfolio`).
-2. Upload `index.html`, `style.css`, and `script.js` to the root of the repo (drag-and-drop on the GitHub web UI works, or use git):
+2. Upload `index.html`, `style.css`, `script.js`, and `resume.pdf` to the root of the repo (drag-and-drop on the GitHub web UI works, or use git):
    ```
    git init
-   git add index.html style.css script.js README.md
+   git add index.html style.css script.js resume.pdf README.md
    git commit -m "Initial portfolio site"
    git branch -M main
    git remote add origin https://github.com/<your-username>/<repo-name>.git
