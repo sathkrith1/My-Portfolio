@@ -25,6 +25,7 @@
     color:var(--text);
     font-family:var(--font-body);
     line-height:1.6;
+    overflow-x:hidden;
     background-image:
       linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
@@ -58,6 +59,7 @@
   }
 
   h1,h2,h3{font-family:var(--font-display);font-weight:700;letter-spacing:-.01em;}
+  h2{font-size:clamp(1.6rem, 3vw, 2.3rem);}
 
   /* ---------- Layout shell ---------- */
   .shell{display:flex;min-height:100vh;}
@@ -423,33 +425,70 @@
   }
 
   /* ---------- Responsive ---------- */
-  @media (max-width:900px){
-    .hero-grid{grid-template-columns:1fr;}
-    .contact-grid{grid-template-columns:1fr;}
-    .viewport{aspect-ratio:16/11;}
+
+  /* Small laptops / large tablets: trim side padding a touch, keep sidebar */
+  @media (max-width:1080px){
+    section{padding:6rem 5vw;}
   }
 
+  /* Tablets: stack hero + contact, shrink the 3D viewport, ease vertical rhythm */
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;}
+    .contact-grid{grid-template-columns:1fr;gap:2rem;}
+    .viewport{aspect-ratio:16/11;}
+    section{padding:5rem 5vw;}
+    #home{padding-top:4rem;padding-bottom:3rem;min-height:auto;}
+  }
+
+  /* Phones: swap sidebar for top bar, single-column grids, roomy tap targets */
   @media (max-width:720px){
     :root{--sidebar-w:0px;}
     .sidebar{display:none;}
     .topbar{
       display:flex;
+      flex-wrap:wrap;
+      row-gap:.7rem;
       position:sticky;top:0;
       z-index:100;
       align-items:center;
       justify-content:space-between;
-      padding:1rem 5vw;
-      background:rgba(11,13,16,.9);
+      padding:.9rem 5vw;
+      background:rgba(11,13,16,.92);
       backdrop-filter:blur(6px);
       border-bottom:1px solid var(--border);
     }
     .topbar .logo{width:34px;height:34px;font-size:.85rem;margin:0;}
-    .topbar nav{display:flex;gap:1.1rem;}
+    .topbar nav{display:flex;flex-wrap:wrap;gap:.9rem;row-gap:.5rem;}
     .topbar .navlink{writing-mode:horizontal-tb;font-size:.62rem;}
     .topbar .navlink::before{display:none;}
     main{margin-left:0;width:100%;}
-    footer{margin-left:0;}
-    section{padding:4.5rem 6vw;}
+    footer{margin-left:0;flex-direction:column;text-align:center;}
+    section{padding:4rem 6vw;}
+
+    .hero h1{font-size:clamp(2rem, 7vw, 2.8rem);}
+    .btn-row{flex-direction:column;align-items:stretch;}
+    .btn{justify-content:center;}
+
+    .skills-grid{grid-template-columns:repeat(auto-fit, minmax(150px, 1fr));gap:.75rem;}
+    .project-grid{grid-template-columns:1fr;}
+    .thumb{height:150px;}
+
+    .log{padding-left:1.4rem;}
+    .log-entry::before{left:-1.82rem;}
+
+    .contact-grid{gap:1.6rem;}
+    .links-panel{padding:1.4rem;}
+  }
+
+  /* Small phones: tighten nav and type further so nothing wraps awkwardly */
+  @media (max-width:400px){
+    .topbar{padding:.8rem 5vw;}
+    .topbar nav{gap:.6rem;}
+    .topbar .navlink{font-size:.58rem;}
+    section{padding:3.2rem 5.5vw;}
+    .role-chip{font-size:.62rem;padding:.28rem .55rem;}
+    .meta-row{font-size:.7rem;}
+    .skills-grid{grid-template-columns:1fr 1fr;}
   }
 
   @media (prefers-reduced-motion: reduce){

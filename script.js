@@ -93,6 +93,7 @@
       renderer.setSize(w, h);
     }
     window.addEventListener('resize', resize);
+    window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 
     // Drag-to-orbit interaction
     let isDragging = false, lastX = 0, lastY = 0;
