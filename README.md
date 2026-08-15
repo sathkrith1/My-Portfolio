@@ -8,15 +8,12 @@ A personal portfolio site to showcase Unity/Unreal projects, skills, and experie
 - `style.css` — all styling
 - `script.js` — nav scroll-tracking, HUD animation, and the 3D viewport scene
 
-## Before you publish — personalize it
+## Status
 
-Open `index.html` and replace these placeholders:
+Name, GitHub, LinkedIn, and email are already filled in. Still pending:
 
-- `Your Name` (appears in the `<title>` and hero heading)
-- The hero paragraph and footer copyright name
-- The **Direct Links** section (`#contact`) — swap the `href="#"` links for your real GitHub, LinkedIn, and resume PDF URL, and update the `mailto:you@example.com` address
-- The **Download Resume** button `href="#"` in the hero
-- The project descriptions/tags if you want to add screenshots, gameplay clips, or itch.io/GitHub links per project
+- **Resume PDF** — the "Resume (Coming Soon)" links (hero button + Direct Links panel) are placeholders until you have an updated resume to link to
+- Project descriptions/tags — add screenshots, gameplay clips, or GitHub/itch.io links per project if you want them
 
 ## Publish on GitHub Pages
 
