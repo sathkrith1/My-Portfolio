@@ -1,12 +1,22 @@
 # Game Developer Portfolio
 
-A personal portfolio site to showcase Unity/Unreal projects, skills, and experience — built with plain HTML, CSS, and JavaScript, with an interactive 3D scene (Three.js) in the hero section.
+A personal portfolio site to showcase Unity/Unreal projects, skills, and experience — built with plain HTML, CSS, and JavaScript, with a **playable 3D hero scene** (Three.js) styled with a chromatic-aberration/glitch look.
+
+## Hero mini-game
+
+The hero isn't just a spinning model — it's a small playable scene:
+
+- Walk a low-poly character around with **WASD / arrow keys** (desktop) or a **virtual joystick** (auto-shown on touch devices)
+- Walking into one of the 6 glowing orbs "collects" a skill — it bursts, the score/dot counter updates, and a glitchy "+1 · SKILL" toast pops up
+- Collect all 6 and a full "PORTFOLIO UNLOCKED!" banner plays
+- The whole scene runs through a hand-written chromatic-aberration shader (RGB-split + scanlines) for that glitchy arcade look, which pulses stronger for a moment on each pickup
+- Project card and skill card titles also get a quick RGB-split glitch on hover, tying the rest of the page into the same aesthetic
 
 ## Files
 
 - `index.html` — page structure/content
-- `style.css` — all styling
-- `script.js` — nav scroll-tracking, HUD animation, and the 3D viewport scene
+- `style.css` — all styling, including the glitch/chromatic-aberration effects and game HUD
+- `script.js` — nav scroll-tracking, the playable hero scene (character controller, collectibles, post-processing shader, joystick), the ambient background, and card tilt
 - `resume.pdf` — downloadable resume, linked from the hero button and Direct Links panel
 
 ## Status
@@ -38,3 +48,4 @@ Name, GitHub, LinkedIn, email, phone, and resume are filled in. Still pending:
    ```
 
 That's it — no build step needed, since it's plain HTML/CSS/JS.
+

@@ -265,6 +265,151 @@
     font-family:var(--font-mono);
     font-size:.62rem;
     color:var(--text-muted);
+    text-align:right;
+    max-width:60%;
+  }
+
+  /* ---------- Glitch / chromatic-aberration text ---------- */
+  .glitch-flicker{
+    animation:flicker 3.4s infinite;
+  }
+  @keyframes flicker{
+    0%, 92%, 100%{ text-shadow:none; }
+    93%{ text-shadow:-2px 0 #ff2ec4, 2px 0 #00e5ff; }
+    94%{ text-shadow:2px 0 #ff2ec4, -2px 0 #00e5ff; }
+    95%{ text-shadow:none; }
+    96%{ text-shadow:-1px 0 #ff2ec4, 1px 0 #00e5ff; }
+    97%{ text-shadow:none; }
+  }
+
+  .glitch{
+    position:relative;
+    color:var(--text);
+  }
+  .glitch::before, .glitch::after{
+    content:attr(data-text);
+    position:absolute;
+    left:0;top:0;
+    width:100%;
+    pointer-events:none;
+  }
+  .glitch::before{
+    color:#ff2ec4;
+    mix-blend-mode:screen;
+    animation:glitch-shift-1 2.6s infinite linear;
+  }
+  .glitch::after{
+    color:#00e5ff;
+    mix-blend-mode:screen;
+    animation:glitch-shift-2 2.2s infinite linear;
+  }
+  @keyframes glitch-shift-1{
+    0%,88%,100%{ transform:translate(0,0); opacity:0; }
+    89%{ transform:translate(-3px,1px); opacity:.85; }
+    91%{ transform:translate(2px,-1px); opacity:.7; }
+    93%{ transform:translate(0,0); opacity:0; }
+  }
+  @keyframes glitch-shift-2{
+    0%,86%,100%{ transform:translate(0,0); opacity:0; }
+    87%{ transform:translate(3px,-1px); opacity:.85; }
+    90%{ transform:translate(-2px,1px); opacity:.7; }
+    92%{ transform:translate(0,0); opacity:0; }
+  }
+
+  .project-body h3{transition:text-shadow .15s, transform .15s;}
+  .project-card:hover .project-body h3{
+    text-shadow:-2px 0 #ff2ec4, 2px 0 #00e5ff;
+  }
+
+  /* ---------- Game HUD: score dots, toasts, complete banner ---------- */
+  .vp-dots{
+    position:absolute;
+    top:16px;left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:6px;
+    z-index:3;
+  }
+  .vp-dot{
+    width:7px;height:7px;
+    border-radius:50%;
+    background:rgba(255,255,255,.18);
+    border:1px solid var(--border);
+    transition:background .25s, box-shadow .25s;
+  }
+  .vp-dot.collected{
+    background:var(--accent);
+    box-shadow:0 0 6px var(--accent);
+    border-color:var(--accent);
+  }
+
+  .vp-toast-layer{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:4;
+    overflow:hidden;
+  }
+  .vp-toast{
+    position:absolute;
+    left:50%;top:46%;
+    transform:translate(-50%,0);
+    font-family:var(--font-mono);
+    font-size:.78rem;
+    letter-spacing:.04em;
+    color:var(--accent);
+    text-shadow:-2px 0 #ff2ec4, 2px 0 #00e5ff;
+    white-space:nowrap;
+    animation:toast-rise 1.4s ease-out forwards;
+  }
+  @keyframes toast-rise{
+    0%{ opacity:0; transform:translate(-50%,10px) scale(.9); }
+    15%{ opacity:1; transform:translate(-50%,0) scale(1); }
+    75%{ opacity:1; }
+    100%{ opacity:0; transform:translate(-50%,-26px) scale(1); }
+  }
+
+  .vp-complete{
+    position:absolute;
+    left:50%;top:50%;
+    transform:translate(-50%,-50%) scale(.9);
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(1.1rem, 4vw, 1.8rem);
+    text-align:center;
+    color:var(--text);
+    opacity:0;
+    pointer-events:none;
+    z-index:5;
+    transition:opacity .4s, transform .4s;
+    text-shadow:0 0 20px rgba(0,0,0,.6);
+  }
+  .vp-complete.show{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
+  }
+
+  /* ---------- Virtual joystick (touch devices) ---------- */
+  .joystick{
+    position:absolute;
+    bottom:20px;left:20px;
+    width:84px;height:84px;
+    border-radius:50%;
+    background:rgba(20,23,28,.5);
+    border:1px solid var(--border);
+    display:none;
+    touch-action:none;
+    z-index:6;
+  }
+  .joystick.active{display:block;}
+  .joystick-nub{
+    position:absolute;
+    top:50%;left:50%;
+    width:34px;height:34px;
+    margin:-17px 0 0 -17px;
+    border-radius:50%;
+    background:rgba(124,242,156,.35);
+    border:1px solid var(--accent-dim);
   }
 
   /* ---------- Skills ---------- */

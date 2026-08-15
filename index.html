@@ -45,8 +45,8 @@
     <section id="home">
       <div class="section-inner hero-grid">
         <div class="hero">
-          <div class="eyebrow">Build: Portfolio_v1.2 // Status: Playable</div>
-          <h1>Sathkrith Gaur<br>Systems that move. Worlds that <span class="accent">react.</span></h1>
+          <div class="eyebrow">Build: Portfolio_v1.3 // Status: Playable</div>
+          <h1>Sathkrith Gaur<br>Systems that move. Worlds that <span class="accent glitch-flicker">react.</span></h1>
           <div class="role-row">
             <span class="role-chip">Game Developer</span>
             <span class="role-chip">Web Developer</span>
@@ -66,10 +66,16 @@
           <div class="vp-corner tr"></div>
           <div class="vp-corner bl"></div>
           <div class="vp-corner br"></div>
-          <div class="vp-hud top-left">SCENE: Portfolio.unity<br><span class="dim">CAM: Perspective</span></div>
-          <div class="vp-hud top-right" id="hud-stats">OBJ: 04<br>TRIS: 12.8K<br>FPS: 60</div>
-          <div class="vp-drag-hint">drag to orbit</div>
+          <div class="vp-hud top-left">LVL_01 // PORTFOLIO.EXE<br><span class="dim" id="hud-hint">WASD / ARROWS TO MOVE</span></div>
+          <div class="vp-hud top-right">PTS: <span id="hud-score">0</span>/<span id="hud-total">6</span></div>
+          <div class="vp-dots" id="vp-dots"></div>
+          <div class="vp-toast-layer" id="vp-toast-layer"></div>
+          <div class="vp-complete glitch" id="vp-complete" data-text="PORTFOLIO UNLOCKED!">PORTFOLIO UNLOCKED!</div>
+          <div class="vp-drag-hint" id="vp-drag-hint">walk into the orbs to collect skills</div>
           <div class="vp-scanline"></div>
+          <div class="joystick" id="joystick">
+            <div class="joystick-nub" id="joystick-nub"></div>
+          </div>
         </div>
       </div>
     </section>

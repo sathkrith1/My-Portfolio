@@ -11,205 +11,384 @@
   }, { rootMargin: '-40% 0px -50% 0px' });
   sections.forEach(s => observer.observe(s));
 
-  /* ---------- HUD stat flicker ---------- */
-  const hud = document.getElementById('hud-stats');
-  setInterval(() => {
-    const tris = (12.5 + Math.random()*0.6).toFixed(1);
-    const fps = 58 + Math.floor(Math.random()*3);
-    hud.innerHTML = `OBJ: 04<br>TRIS: ${tris}K<br>FPS: ${fps}`;
-  }, 1800);
+  /* ---------- Glitch text: mirror content into data-text for pseudo-element layers ---------- */
+  document.querySelectorAll('.glitch').forEach(el => {
+    if(!el.getAttribute('data-text')) el.setAttribute('data-text', el.textContent);
+  });
 
-  /* ---------- Three.js viewport scene ---------- */
+  const IS_TOUCH = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+
+  /* ---------- Playable hero scene: walk the character into orbs to collect skills ---------- */
   (function(){
     const container = document.getElementById('viewport');
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    if(!container) return;
+    let width = container.clientWidth;
+    let height = container.clientHeight;
 
+    const hudHint = document.getElementById('hud-hint');
+    const dragHint = document.getElementById('vp-drag-hint');
+    if(hudHint) hudHint.textContent = IS_TOUCH ? 'DRAG JOYSTICK TO MOVE' : 'WASD / ARROWS TO MOVE';
+    if(dragHint) dragHint.textContent = 'walk into the orbs to collect skills';
+
+    const SKILLS = ['Unreal Engine 5', 'Unity / C#', 'Blueprints', 'Enemy AI', 'Web Dev', 'Combat Systems'];
+
+    // ---- score dots ----
+    const dotsLayer = document.getElementById('vp-dots');
+    const dotEls = SKILLS.map(() => {
+      const d = document.createElement('div');
+      d.className = 'vp-dot';
+      dotsLayer.appendChild(d);
+      return d;
+    });
+    const scoreEl = document.getElementById('hud-score');
+    const totalEl = document.getElementById('hud-total');
+    if(totalEl) totalEl.textContent = SKILLS.length;
+    const toastLayer = document.getElementById('vp-toast-layer');
+    const completeEl = document.getElementById('vp-complete');
+
+    function spawnToast(text){
+      const t = document.createElement('div');
+      t.className = 'vp-toast';
+      t.textContent = text;
+      t.style.left = (44 + Math.random() * 12) + '%';
+      toastLayer.appendChild(t);
+      setTimeout(() => t.remove(), 1500);
+    }
+
+    // ---- three.js setup ----
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0b0d10, 0.055);
+    scene.fog = new THREE.FogExp2(0x0b0d10, 0.05);
+    scene.background = new THREE.Color(0x0b0d10);
 
-    const camera = new THREE.PerspectiveCamera(45, width/height, 0.1, 100);
-    camera.position.set(0, 2.4, 7);
+    const camera = new THREE.PerspectiveCamera(48, width / height, 0.1, 100);
 
     const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(width, height);
     container.insertBefore(renderer.domElement, container.firstChild);
 
-    // Lighting
-    scene.add(new THREE.AmbientLight(0x8899aa, 0.6));
-    const key = new THREE.PointLight(0x7cf29c, 1.2, 20);
-    key.position.set(4, 5, 4);
+    scene.add(new THREE.AmbientLight(0x8899aa, 0.7));
+    const key = new THREE.PointLight(0x7cf29c, 1.1, 24);
+    key.position.set(4, 6, 4);
     scene.add(key);
-    const rim = new THREE.PointLight(0xff9f5b, 0.9, 20);
-    rim.position.set(-4, 2, -3);
+    const rim = new THREE.PointLight(0xff9f5b, 0.8, 24);
+    rim.position.set(-4, 3, -3);
     scene.add(rim);
 
-    // Floor grid (viewport ground)
-    const grid = new THREE.GridHelper(14, 22, 0x2a3038, 0x1a1e24);
-    grid.position.y = -1.6;
+    // ---- floor ----
+    const FLOOR_SIZE = 9;
+    const grid = new THREE.GridHelper(FLOOR_SIZE * 2, 22, 0x2a3038, 0x1a1e24);
     scene.add(grid);
+    const floorMat = new THREE.MeshStandardMaterial({ color:0x0e1116, roughness:0.95, metalness:0.05 });
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(FLOOR_SIZE * 2, FLOOR_SIZE * 2), floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -0.01;
+    scene.add(floor);
 
-    // Group of "game objects" orbiting a center point
-    const group = new THREE.Group();
-    scene.add(group);
+    // ---- character (simple blocky robot) ----
+    const character = new THREE.Group();
+    const bodyMat = new THREE.MeshStandardMaterial({ color:0xd7dde3, metalness:0.2, roughness:0.5 });
+    const darkMat = new THREE.MeshStandardMaterial({ color:0x1c2026, metalness:0.3, roughness:0.6 });
+    const eyeMat = new THREE.MeshStandardMaterial({ color:0x7cf29c, emissive:0x7cf29c, emissiveIntensity:1.2 });
 
-    const wireMat = new THREE.MeshStandardMaterial({
-      color: 0x7cf29c, wireframe:true, transparent:true, opacity:0.9
-    });
-    const solidMat = new THREE.MeshStandardMaterial({
-      color: 0x191d23, metalness:0.3, roughness:0.6, emissive:0x0c3d24, emissiveIntensity:0.4
-    });
-    const amberMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1103, metalness:0.2, roughness:0.5, emissive:0x7a4419, emissiveIntensity:0.5
-    });
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.55, 0.32), bodyMat);
+    body.position.y = 0.55;
+    character.add(body);
 
-    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.15, 0), solidMat);
-    group.add(core);
-    const coreWire = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 0), wireMat);
-    group.add(coreWire);
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.32, 0.36), darkMat);
+    head.position.y = 0.98;
+    character.add(head);
 
-    // Soft glow sprite behind the core (cheap fake-bloom, no post-processing needed)
+    const eyeGeo = new THREE.SphereGeometry(0.035, 8, 8);
+    const eyeL = new THREE.Mesh(eyeGeo, eyeMat); eyeL.position.set(-0.09, 0.96, 0.19);
+    const eyeR = new THREE.Mesh(eyeGeo, eyeMat); eyeR.position.set(0.09, 0.96, 0.19);
+    character.add(eyeL, eyeR);
+
+    function makeLimb(w,h,d,x,y,z){
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), darkMat);
+      m.position.set(x,y,z);
+      const pivot = new THREE.Group();
+      pivot.position.set(x, y + h/2, z);
+      m.position.set(0, -h/2, 0);
+      pivot.add(m);
+      character.add(pivot);
+      return pivot;
+    }
+    const legL = makeLimb(0.14, 0.42, 0.16, -0.14, 0.42, 0);
+    const legR = makeLimb(0.14, 0.42, 0.16, 0.14, 0.42, 0);
+    const armL = makeLimb(0.12, 0.36, 0.14, -0.32, 0.75, 0);
+    const armR = makeLimb(0.12, 0.36, 0.14, 0.32, 0.75, 0);
+
+    const shadowBlob = new THREE.Mesh(
+      new THREE.CircleGeometry(0.34, 20),
+      new THREE.MeshBasicMaterial({ color:0x000000, transparent:true, opacity:0.35 })
+    );
+    shadowBlob.rotation.x = -Math.PI / 2;
+    shadowBlob.position.y = 0.005;
+    character.add(shadowBlob);
+
+    character.position.set(0, 0, 2.5);
+    scene.add(character);
+
+    // ---- collectible orbs ----
     function makeGlowTexture(hex){
       const c = document.createElement('canvas');
-      c.width = c.height = 256;
+      c.width = c.height = 128;
       const ctx = c.getContext('2d');
-      const g = ctx.createRadialGradient(128,128,0,128,128,128);
-      g.addColorStop(0, hex + 'cc');
-      g.addColorStop(0.5, hex + '22');
+      const g = ctx.createRadialGradient(64,64,0,64,64,64);
+      g.addColorStop(0, hex + 'ee');
+      g.addColorStop(0.5, hex + '33');
       g.addColorStop(1, hex + '00');
       ctx.fillStyle = g;
-      ctx.fillRect(0,0,256,256);
+      ctx.fillRect(0,0,128,128);
       return new THREE.CanvasTexture(c);
     }
-    const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: makeGlowTexture('#7cf29c'), transparent:true, depthWrite:false, blending: THREE.AdditiveBlending
-    }));
-    glowSprite.scale.set(5, 5, 1);
-    group.add(glowSprite);
+    const orbGlowTex = makeGlowTexture('#7cf29c');
 
-    // Tilted gizmo rings, like an engine's orbit/selection gizmo
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(2.1, 0.014, 8, 100),
-      new THREE.MeshBasicMaterial({ color:0x7cf29c, transparent:true, opacity:0.4 })
-    );
-    ring.rotation.x = Math.PI / 2.4;
-    group.add(ring);
+    const orbAngles = SKILLS.map((_, i) => (i / SKILLS.length) * Math.PI * 2);
+    const orbs = SKILLS.map((skill, i) => {
+      const g = new THREE.Group();
+      const radius = 3.4 + (i % 2) * 1.6;
+      const a = orbAngles[i];
+      g.position.set(Math.cos(a) * radius, 0.55, Math.sin(a) * radius);
 
-    const ring2 = new THREE.Mesh(
-      new THREE.TorusGeometry(2.1, 0.014, 8, 100),
-      new THREE.MeshBasicMaterial({ color:0xff9f5b, transparent:true, opacity:0.3 })
-    );
-    ring2.rotation.x = Math.PI / 1.7;
-    ring2.rotation.z = Math.PI / 6;
-    ring2.scale.setScalar(1.25);
-    group.add(ring2);
+      const core = new THREE.Mesh(
+        new THREE.IcosahedronGeometry(0.16, 0),
+        new THREE.MeshStandardMaterial({
+          color: i % 2 === 0 ? 0x7cf29c : 0xff9f5b,
+          emissive: i % 2 === 0 ? 0x2f7d4c : 0x7a4419,
+          emissiveIntensity:0.9, metalness:0.3, roughness:0.4
+        })
+      );
+      g.add(core);
 
-    // Fine drifting dust inside the viewport volume, for depth
-    const dustCount = 130;
-    const dustPos = new Float32Array(dustCount * 3);
-    for(let i=0;i<dustCount;i++){
-      const r = 2.2 + Math.random()*2.3;
-      const theta = Math.random()*Math.PI*2;
-      const phi = Math.acos((Math.random()*2)-1);
-      dustPos[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-      dustPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta) * 0.55;
-      dustPos[i*3+2] = r * Math.cos(phi);
-    }
-    const dustGeo = new THREE.BufferGeometry();
-    dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-    const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
-      size:0.045, color:0x9fb0bd, transparent:true, opacity:0.55
-    }));
-    group.add(dust);
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: orbGlowTex, transparent:true, depthWrite:false, blending: THREE.AdditiveBlending
+      }));
+      glow.scale.set(1, 1, 1);
+      g.add(glow);
 
-    const orbiters = [];
-    const geoms = [
-      new THREE.BoxGeometry(0.5, 0.5, 0.5),
-      new THREE.TorusGeometry(0.35, 0.12, 8, 24),
-      new THREE.OctahedronGeometry(0.4, 0),
-      new THREE.BoxGeometry(0.35, 0.35, 0.35)
-    ];
-    geoms.forEach((geo, i) => {
-      const mat = i % 2 === 0 ? amberMat : wireMat.clone();
-      const mesh = new THREE.Mesh(geo, mat);
-      const radius = 2.5 + i * 0.35;
-      const angle = (i / geoms.length) * Math.PI * 2;
-      mesh.userData = { radius, angle, speed: 0.25 + i * 0.07, yOff: i * 0.6 };
-      group.add(mesh);
-      orbiters.push(mesh);
+      g.userData = { skill, collected:false, bobOff: Math.random()*10, core, glow, index:i };
+      scene.add(g);
+      return g;
     });
 
+    let collectedCount = 0;
+
+    function collectOrb(orb){
+      if(orb.userData.collected) return;
+      orb.userData.collected = true;
+      collectedCount++;
+      scoreEl.textContent = collectedCount;
+      dotEls[orb.userData.index].classList.add('collected');
+      spawnToast('+1 · ' + orb.userData.skill.toUpperCase());
+      pulseAmount(0.012, 220);
+
+      // quick burst-and-fade animation
+      const startScale = orb.scale.x;
+      const t0 = performance.now();
+      function burst(){
+        const p = Math.min((performance.now() - t0) / 320, 1);
+        const s = startScale * (1 + p * 1.8);
+        orb.scale.setScalar(s);
+        orb.userData.core.material.opacity = 1 - p;
+        orb.userData.core.material.transparent = true;
+        if(p < 1){ requestAnimationFrame(burst); } else { scene.remove(orb); }
+      }
+      burst();
+
+      if(collectedCount === SKILLS.length){
+        setTimeout(() => {
+          completeEl.classList.add('show');
+          pulseAmount(0.02, 900);
+          setTimeout(() => completeEl.classList.remove('show'), 3200);
+        }, 350);
+      }
+    }
+
+    // ---- chromatic-aberration post-process (manual, no jsm needed) ----
+    let rt = new THREE.WebGLRenderTarget(width, height);
+    const postScene = new THREE.Scene();
+    const postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const postMat = new THREE.ShaderMaterial({
+      uniforms:{
+        tDiffuse:{ value: rt.texture },
+        uAmount:{ value: 0.0032 },
+        uTime:{ value: 0 }
+      },
+      vertexShader:`
+        varying vec2 vUv;
+        void main(){ vUv = uv; gl_Position = vec4(position, 1.0); }
+      `,
+      fragmentShader:`
+        uniform sampler2D tDiffuse;
+        uniform float uAmount;
+        uniform float uTime;
+        varying vec2 vUv;
+        void main(){
+          vec2 dir = vUv - 0.5;
+          vec2 offset = dir * uAmount * (1.0 + length(dir) * 1.5);
+          float r = texture2D(tDiffuse, vUv - offset).r;
+          float g = texture2D(tDiffuse, vUv).g;
+          float b = texture2D(tDiffuse, vUv + offset).b;
+          float scan = sin((vUv.y + uTime * 0.02) * 700.0) * 0.015;
+          vec3 col = vec3(r, g, b) - scan;
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
+    const postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMat);
+    postScene.add(postQuad);
+
+    let aberrationBoost = 0, aberrationDecay = 0;
+    function pulseAmount(amt, ms){
+      aberrationBoost = amt;
+      aberrationDecay = amt / (ms / 16);
+    }
+
     function resize(){
-      const w = container.clientWidth, h = container.clientHeight;
-      camera.aspect = w / h;
+      width = container.clientWidth; height = container.clientHeight;
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      renderer.setSize(width, height);
+      rt.setSize(width, height);
     }
     window.addEventListener('resize', resize);
     window.addEventListener('orientationchange', () => setTimeout(resize, 200));
 
-    // Drag-to-orbit interaction
-    let isDragging = false, lastX = 0, lastY = 0;
-    let autoRotate = true, idleTimer = null;
-    let targetRotY = 0, targetRotX = -0.15;
-    let currentRotY = 0, currentRotX = -0.15;
+    // ---- controls: keyboard (desktop) + virtual joystick (touch) ----
+    const keys = {};
+    const MOVE_KEYS = ['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'];
+    function isTypingTarget(el){
+      return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+    }
+    let heroVisible = true;
+    const heroObserver = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        heroVisible = en.isIntersecting;
+        if(!heroVisible){ Object.keys(keys).forEach(k => keys[k] = false); }
+      });
+    }, { threshold:0.15 });
+    heroObserver.observe(container.closest('section'));
 
-    function pointerDown(x, y){
-      isDragging = true;
-      autoRotate = false;
-      lastX = x; lastY = y;
-      if(idleTimer) clearTimeout(idleTimer);
-    }
-    function pointerMove(x, y){
-      if(!isDragging) return;
-      const dx = x - lastX, dy = y - lastY;
-      targetRotY += dx * 0.005;
-      targetRotX += dy * 0.003;
-      targetRotX = Math.max(-0.8, Math.min(0.8, targetRotX));
-      lastX = x; lastY = y;
-    }
-    function pointerUp(){
-      isDragging = false;
-      idleTimer = setTimeout(() => { autoRotate = true; }, 2200);
+    window.addEventListener('keydown', e => {
+      if(!heroVisible || isTypingTarget(document.activeElement)) return;
+      const k = e.key.toLowerCase();
+      keys[k] = true;
+      if(MOVE_KEYS.includes(k)) e.preventDefault();
+    });
+    window.addEventListener('keyup', e => {
+      if(isTypingTarget(document.activeElement)) return;
+      keys[e.key.toLowerCase()] = false;
+    });
+
+    let joyVec = { x:0, y:0 };
+    const joystick = document.getElementById('joystick');
+    const nub = document.getElementById('joystick-nub');
+    if(IS_TOUCH && joystick){
+      joystick.classList.add('active');
+      let dragging = false, originX = 0, originY = 0;
+      const maxR = 30;
+
+      function start(x, y){ dragging = true; originX = x; originY = y; }
+      function move(x, y){
+        if(!dragging) return;
+        let dx = x - originX, dy = y - originY;
+        const dist = Math.min(Math.hypot(dx, dy), maxR);
+        const ang = Math.atan2(dy, dx);
+        dx = Math.cos(ang) * dist; dy = Math.sin(ang) * dist;
+        nub.style.transform = `translate(${dx}px, ${dy}px)`;
+        joyVec.x = dx / maxR; joyVec.y = dy / maxR;
+      }
+      function end(){
+        dragging = false;
+        nub.style.transform = '';
+        joyVec.x = 0; joyVec.y = 0;
+      }
+      joystick.addEventListener('touchstart', e => {
+        const t = e.touches[0]; start(t.clientX, t.clientY); e.preventDefault();
+      }, { passive:false });
+      window.addEventListener('touchmove', e => {
+        if(!dragging) return;
+        const t = e.touches[0]; move(t.clientX, t.clientY);
+      }, { passive:true });
+      window.addEventListener('touchend', end);
     }
 
-    const dom = renderer.domElement;
-    dom.style.cursor = 'grab';
-    dom.addEventListener('mousedown', e => { pointerDown(e.clientX, e.clientY); dom.style.cursor='grabbing'; });
-    window.addEventListener('mousemove', e => pointerMove(e.clientX, e.clientY));
-    window.addEventListener('mouseup', () => { pointerUp(); dom.style.cursor='grab'; });
-    dom.addEventListener('touchstart', e => { const t=e.touches[0]; pointerDown(t.clientX, t.clientY); }, {passive:true});
-    dom.addEventListener('touchmove', e => { const t=e.touches[0]; pointerMove(t.clientX, t.clientY); }, {passive:true});
-    dom.addEventListener('touchend', pointerUp);
+    // ---- camera chase state ----
+    const camOffset = new THREE.Vector3(0, 4.6, 5.6);
+    const camCurrent = new THREE.Vector3().copy(camera.position);
+    let facing = 0;
 
     const clock = new THREE.Clock();
     function animate(){
       requestAnimationFrame(animate);
-      const t = clock.getElapsedTime();
+      const dt = Math.min(clock.getDelta(), 0.05);
+      const t = clock.elapsedTime;
 
-      if(autoRotate){ targetRotY += 0.0025; }
-      currentRotY += (targetRotY - currentRotY) * 0.08;
-      currentRotX += (targetRotX - currentRotX) * 0.08;
-      group.rotation.y = currentRotY;
-      group.rotation.x = currentRotX;
+      // movement input
+      let mx = 0, mz = 0;
+      if(keys['w'] || keys['arrowup']) mz -= 1;
+      if(keys['s'] || keys['arrowdown']) mz += 1;
+      if(keys['a'] || keys['arrowleft']) mx -= 1;
+      if(keys['d'] || keys['arrowright']) mx += 1;
+      if(IS_TOUCH){ mx += joyVec.x; mz += joyVec.y; }
 
-      core.rotation.y = t * 0.15;
-      coreWire.rotation.y = -t * 0.1;
-      ring.rotation.z += 0.0025;
-      ring2.rotation.z -= 0.0018;
-      dust.rotation.y += 0.0006;
-      glowSprite.scale.setScalar(5 + Math.sin(t * 0.8) * 0.3);
+      const len = Math.hypot(mx, mz);
+      const moving = len > 0.05;
+      if(moving){
+        mx /= len; mz /= len;
+        const speed = 2.6;
+        character.position.x += mx * speed * dt;
+        character.position.z += mz * speed * dt;
+        character.position.x = Math.max(-FLOOR_SIZE + 0.4, Math.min(FLOOR_SIZE - 0.4, character.position.x));
+        character.position.z = Math.max(-FLOOR_SIZE + 0.4, Math.min(FLOOR_SIZE - 0.4, character.position.z));
 
-      orbiters.forEach(m => {
-        const { radius, angle, speed, yOff } = m.userData;
-        const a = angle + t * speed;
-        m.position.set(Math.cos(a) * radius, Math.sin(t + yOff) * 0.4, Math.sin(a) * radius);
-        m.rotation.x += 0.01;
-        m.rotation.y += 0.012;
+        const targetFacing = Math.atan2(mx, mz);
+        let diff = targetFacing - facing;
+        while(diff > Math.PI) diff -= Math.PI * 2;
+        while(diff < -Math.PI) diff += Math.PI * 2;
+        facing += diff * Math.min(dt * 10, 1);
+        character.rotation.y = facing;
+
+        const walkCycle = t * 9;
+        legL.rotation.x = Math.sin(walkCycle) * 0.6;
+        legR.rotation.x = -Math.sin(walkCycle) * 0.6;
+        armL.rotation.x = -Math.sin(walkCycle) * 0.5;
+        armR.rotation.x = Math.sin(walkCycle) * 0.5;
+        body.position.y = 0.55 + Math.abs(Math.sin(walkCycle)) * 0.03;
+      } else {
+        legL.rotation.x += (0 - legL.rotation.x) * 0.2;
+        legR.rotation.x += (0 - legR.rotation.x) * 0.2;
+        armL.rotation.x += (0 - armL.rotation.x) * 0.2;
+        armR.rotation.x += (0 - armR.rotation.x) * 0.2;
+        body.position.y = 0.55 + Math.sin(t * 2) * 0.01;
+      }
+
+      // orb bob + collision
+      orbs.forEach(orb => {
+        if(orb.userData.collected) return;
+        orb.position.y = 0.55 + Math.sin(t * 1.6 + orb.userData.bobOff) * 0.12;
+        orb.rotation.y += 0.02;
+        const dist = Math.hypot(orb.position.x - character.position.x, orb.position.z - character.position.z);
+        if(dist < 0.45) collectOrb(orb);
       });
 
+      // chase camera
+      const desired = character.position.clone().add(camOffset);
+      camCurrent.lerp(desired, 1 - Math.pow(0.001, dt));
+      camera.position.copy(camCurrent);
+      camera.lookAt(character.position.x, character.position.y + 0.7, character.position.z);
+
+      // chromatic aberration pulse decay
+      if(aberrationBoost > 0){ aberrationBoost = Math.max(0, aberrationBoost - aberrationDecay); }
+      postMat.uniforms.uAmount.value = 0.0032 + aberrationBoost;
+      postMat.uniforms.uTime.value = t;
+
+      renderer.setRenderTarget(rt);
       renderer.render(scene, camera);
+      renderer.setRenderTarget(null);
+      renderer.render(postScene, postCamera);
     }
     animate();
   })();
