@@ -18,7 +18,104 @@
 
   const IS_TOUCH = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 
-  /* ---------- Playable hero scene: walk the character into orbs to collect skills ---------- */
+  /* ---------- Theme toggle (also triggerable by the in-scene Theme Portal) ---------- */
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  function setTheme(light){
+    document.documentElement.classList.toggle('light-theme', light);
+    if(themeToggleBtn) themeToggleBtn.textContent = light ? '☀ LIGHT' : '☾ DARK';
+    try{ localStorage.setItem('portfolio-theme', light ? 'light' : 'dark'); }catch(e){}
+  }
+  (function initTheme(){
+    let saved = null;
+    try{ saved = localStorage.getItem('portfolio-theme'); }catch(e){}
+    setTheme(saved === 'light');
+  })();
+  function toggleTheme(){ setTheme(!document.documentElement.classList.contains('light-theme')); }
+  if(themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+
+  /* ---------- Home jump button ---------- */
+  const homeJumpBtn = document.getElementById('home-jump');
+  if(homeJumpBtn){
+    homeJumpBtn.addEventListener('click', () => {
+      document.getElementById('home').scrollIntoView({ behavior:'smooth' });
+    });
+  }
+
+  /* ---------- Procedural ambient music toggle (Web Audio, no external file) ---------- */
+  const musicToggleBtn = document.getElementById('music-toggle');
+  let audioCtx = null, musicNodes = null, musicOn = false;
+  function startMusic(){
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+
+    const master = audioCtx.createGain();
+    master.gain.value = 0.05;
+    master.connect(audioCtx.destination);
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 900;
+    filter.connect(master);
+
+    const notes = [110, 146.83, 164.81, 220]; // A2 D3 E3 A3 - simple ambient pad
+    const oscs = notes.map((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const g = audioCtx.createGain();
+      g.gain.value = 0;
+      osc.connect(g);
+      g.connect(filter);
+      osc.start();
+      const now = audioCtx.currentTime;
+      g.gain.linearRampToValueAtTime(0.18, now + 2 + i * 0.4);
+      return { osc, g };
+    });
+
+    // slow LFO drifting the filter for movement
+    const lfo = audioCtx.createOscillator();
+    lfo.frequency.value = 0.05;
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 300;
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+    lfo.start();
+
+    musicNodes = { master, filter, oscs, lfo };
+  }
+  function stopMusic(){
+    if(!musicNodes) return;
+    const now = audioCtx.currentTime;
+    musicNodes.master.gain.linearRampToValueAtTime(0, now + 0.6);
+    setTimeout(() => {
+      musicNodes.oscs.forEach(o => o.osc.stop());
+      musicNodes.lfo.stop();
+      musicNodes = null;
+    }, 700);
+  }
+  if(musicToggleBtn){
+    musicToggleBtn.addEventListener('click', () => {
+      musicOn = !musicOn;
+      musicToggleBtn.textContent = musicOn ? '♪ MUSIC: ON' : '♪ MUSIC: OFF';
+      if(musicOn) startMusic(); else stopMusic();
+    });
+  }
+
+  /* ---------- Contact form -> opens the visitor's email client, addressed to Sathkrith ---------- */
+  const contactForm = document.getElementById('contact-form');
+  if(contactForm){
+    contactForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const fromEmail = document.getElementById('email').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const subject = encodeURIComponent(`Portfolio contact from ${name || 'your site'}`);
+      const body = encodeURIComponent(`${message}\n\n— ${name}\n${fromEmail}`);
+      window.location.href = `mailto:sathkrith0@gmail.com?subject=${subject}&body=${body}`;
+    });
+  }
+
+  /* ---------- Playable hero scene: walk the character into coins & portals ---------- */
   (function(){
     const container = document.getElementById('viewport');
     if(!container) return;
@@ -28,11 +125,13 @@
     const hudHint = document.getElementById('hud-hint');
     const dragHint = document.getElementById('vp-drag-hint');
     if(hudHint) hudHint.textContent = IS_TOUCH ? 'DRAG JOYSTICK TO MOVE' : 'WASD / ARROWS TO MOVE';
-    if(dragHint) dragHint.textContent = 'walk into the orbs to collect skills';
+    if(dragHint) dragHint.textContent = 'collect coins · walk through a portal to jump sections';
 
     const SKILLS = ['Unreal Engine 5', 'Unity / C#', 'Blueprints', 'Enemy AI', 'Web Dev', 'Combat Systems'];
+    const BONUS_COIN_COUNT = 8;
+    const TOTAL_COLLECTIBLES = SKILLS.length + BONUS_COIN_COUNT;
 
-    // ---- score dots ----
+    // ---- score dots (one per named skill) ----
     const dotsLayer = document.getElementById('vp-dots');
     const dotEls = SKILLS.map(() => {
       const d = document.createElement('div');
@@ -42,7 +141,10 @@
     });
     const scoreEl = document.getElementById('hud-score');
     const totalEl = document.getElementById('hud-total');
-    if(totalEl) totalEl.textContent = SKILLS.length;
+    if(totalEl) totalEl.textContent = TOTAL_COLLECTIBLES;
+    const sbCountEl = document.getElementById('sb-count');
+    const sbTotalEl = document.getElementById('sb-total');
+    if(sbTotalEl) sbTotalEl.textContent = TOTAL_COLLECTIBLES;
     const toastLayer = document.getElementById('vp-toast-layer');
     const completeEl = document.getElementById('vp-complete');
 
@@ -130,7 +232,7 @@
     character.position.set(0, 0, 2.5);
     scene.add(character);
 
-    // ---- collectible orbs ----
+    // ---- collectible coins (skill coins + bonus coins) ----
     function makeGlowTexture(hex){
       const c = document.createElement('canvas');
       c.width = c.height = 128;
@@ -143,45 +245,113 @@
       ctx.fillRect(0,0,128,128);
       return new THREE.CanvasTexture(c);
     }
-    const orbGlowTex = makeGlowTexture('#7cf29c');
+    const coinGlowTex = makeGlowTexture('#ffd35c');
+    const coinGeo = new THREE.CylinderGeometry(0.16, 0.16, 0.045, 24);
+    const coinMat = new THREE.MeshStandardMaterial({
+      color:0xffd35c, emissive:0x8a5b0e, emissiveIntensity:0.7, metalness:0.75, roughness:0.3
+    });
 
-    const orbAngles = SKILLS.map((_, i) => (i / SKILLS.length) * Math.PI * 2);
-    const orbs = SKILLS.map((skill, i) => {
+    function makeCoin(x, z, skill, index){
       const g = new THREE.Group();
-      const radius = 3.4 + (i % 2) * 1.6;
-      const a = orbAngles[i];
-      g.position.set(Math.cos(a) * radius, 0.55, Math.sin(a) * radius);
+      g.position.set(x, 0.55, z);
 
-      const core = new THREE.Mesh(
-        new THREE.IcosahedronGeometry(0.16, 0),
-        new THREE.MeshStandardMaterial({
-          color: i % 2 === 0 ? 0x7cf29c : 0xff9f5b,
-          emissive: i % 2 === 0 ? 0x2f7d4c : 0x7a4419,
-          emissiveIntensity:0.9, metalness:0.3, roughness:0.4
-        })
-      );
+      const core = new THREE.Mesh(coinGeo, coinMat.clone());
       g.add(core);
 
       const glow = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: orbGlowTex, transparent:true, depthWrite:false, blending: THREE.AdditiveBlending
+        map: coinGlowTex, transparent:true, depthWrite:false, blending: THREE.AdditiveBlending
       }));
-      glow.scale.set(1, 1, 1);
+      glow.scale.set(0.8, 0.8, 1);
       g.add(glow);
 
-      g.userData = { skill, collected:false, bobOff: Math.random()*10, core, glow, index:i };
+      g.userData = { skill: skill || null, collected:false, bobOff: Math.random()*10, core, glow, index };
+      scene.add(g);
+      return g;
+    }
+
+    const orbAngles = SKILLS.map((_, i) => (i / SKILLS.length) * Math.PI * 2);
+    const orbs = SKILLS.map((skill, i) => {
+      const radius = 3.4 + (i % 2) * 1.6;
+      const a = orbAngles[i];
+      return makeCoin(Math.cos(a) * radius, Math.sin(a) * radius, skill, i);
+    });
+
+    // Bonus coins: unlabeled, scattered for extra score, no repeat too close to skill coins
+    for(let i = 0; i < BONUS_COIN_COUNT; i++){
+      const a = Math.random() * Math.PI * 2;
+      const r = 1.4 + Math.random() * 6.2;
+      orbs.push(makeCoin(Math.cos(a) * r, Math.sin(a) * r, null, SKILLS.length + i));
+    }
+
+    let collectedCount = 0;
+
+    // ---- navigation portals: walk through one to jump to a section, or flip the theme ----
+    function scrollToSection(id){
+      const el = document.getElementById(id);
+      if(el) el.scrollIntoView({ behavior:'smooth' });
+    }
+    function makeLabelSprite(text, colorHex){
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 64;
+      const ctx = c.getContext('2d');
+      ctx.font = '700 26px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowColor = colorHex;
+      ctx.shadowBlur = 14;
+      ctx.fillStyle = colorHex;
+      ctx.fillText(text, 128, 32);
+      const tex = new THREE.CanvasTexture(c);
+      const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map:tex, transparent:true, depthWrite:false }));
+      sprite.scale.set(1.7, 0.42, 1);
+      return sprite;
+    }
+
+    const PORTAL_DEFS = [
+      { id:'theme',    label:'THEME',    color:'#b79bff', angle: Math.PI * 0.25, action: () => toggleTheme() },
+      { id:'skills',   label:'SKILLS',   color:'#7cf29c', angle: Math.PI * 1.1,  action: () => scrollToSection('skills') },
+      { id:'projects', label:'PROJECTS', color:'#ff9f5b', angle: Math.PI * 1.75, action: () => scrollToSection('projects') },
+      { id:'contact',  label:'CONTACT',  color:'#5bc8ff', angle: Math.PI * 0.7,  action: () => scrollToSection('contact') }
+    ];
+    const portals = PORTAL_DEFS.map(p => {
+      const g = new THREE.Group();
+      const radius = 7.3;
+      g.position.set(Math.cos(p.angle) * radius, 0.9, Math.sin(p.angle) * radius);
+      g.rotation.y = p.angle + Math.PI / 2;
+
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(0.7, 0.06, 12, 32),
+        new THREE.MeshStandardMaterial({ color:p.color, emissive:p.color, emissiveIntensity:0.6, metalness:0.4, roughness:0.35 })
+      );
+      g.add(ring);
+
+      const glow = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: makeGlowTexture(p.color), transparent:true, depthWrite:false, blending: THREE.AdditiveBlending
+      }));
+      glow.scale.set(2.4, 2.4, 1);
+      g.add(glow);
+
+      const label = makeLabelSprite(p.label, p.color);
+      label.position.set(0, 1.05, 0);
+      g.add(label);
+
+      g.userData = { ...p, wasInside:false, ring };
       scene.add(g);
       return g;
     });
-
-    let collectedCount = 0;
 
     function collectOrb(orb){
       if(orb.userData.collected) return;
       orb.userData.collected = true;
       collectedCount++;
       scoreEl.textContent = collectedCount;
-      dotEls[orb.userData.index].classList.add('collected');
-      spawnToast('+1 · ' + orb.userData.skill.toUpperCase());
+      if(sbCountEl) sbCountEl.textContent = collectedCount;
+      if(orb.userData.skill){
+        dotEls[orb.userData.index].classList.add('collected');
+        spawnToast('+1 · ' + orb.userData.skill.toUpperCase());
+      } else {
+        spawnToast('+1 COIN');
+      }
       pulseAmount(0.012, 220);
 
       // quick burst-and-fade animation
@@ -197,7 +367,7 @@
       }
       burst();
 
-      if(collectedCount === SKILLS.length){
+      if(collectedCount === TOTAL_COLLECTIBLES){
         setTimeout(() => {
           completeEl.classList.add('show');
           pulseAmount(0.02, 900);
@@ -319,6 +489,7 @@
     const camOffset = new THREE.Vector3(0, 4.6, 5.6);
     const camCurrent = new THREE.Vector3().copy(camera.position);
     let facing = 0;
+    let lastMoveTime = performance.now();
 
     const clock = new THREE.Clock();
     function animate(){
@@ -337,6 +508,7 @@
       const len = Math.hypot(mx, mz);
       const moving = len > 0.05;
       if(moving){
+        lastMoveTime = performance.now();
         mx /= len; mz /= len;
         const speed = 2.6;
         character.position.x += mx * speed * dt;
@@ -357,21 +529,51 @@
         armL.rotation.x = -Math.sin(walkCycle) * 0.5;
         armR.rotation.x = Math.sin(walkCycle) * 0.5;
         body.position.y = 0.55 + Math.abs(Math.sin(walkCycle)) * 0.03;
+      } else if(performance.now() - lastMoveTime > 4000){
+        // idle too long — bust out a little dance
+        const dt2 = t * 5;
+        legL.rotation.x += (Math.sin(dt2) * 0.25 - legL.rotation.x) * 0.2;
+        legR.rotation.x += (-Math.sin(dt2) * 0.25 - legR.rotation.x) * 0.2;
+        armL.rotation.z = Math.sin(dt2) * 0.6;
+        armR.rotation.z = -Math.sin(dt2) * 0.6;
+        armL.rotation.x += (0 - armL.rotation.x) * 0.2;
+        armR.rotation.x += (0 - armR.rotation.x) * 0.2;
+        character.rotation.z = Math.sin(dt2 * 0.6) * 0.09;
+        character.rotation.y += Math.sin(dt2 * 0.3) * 0.004;
+        body.position.y = 0.55 + Math.abs(Math.sin(dt2 * 1.3)) * 0.05;
       } else {
         legL.rotation.x += (0 - legL.rotation.x) * 0.2;
         legR.rotation.x += (0 - legR.rotation.x) * 0.2;
         armL.rotation.x += (0 - armL.rotation.x) * 0.2;
         armR.rotation.x += (0 - armR.rotation.x) * 0.2;
+        armL.rotation.z += (0 - armL.rotation.z) * 0.2;
+        armR.rotation.z += (0 - armR.rotation.z) * 0.2;
+        character.rotation.z += (0 - character.rotation.z) * 0.2;
         body.position.y = 0.55 + Math.sin(t * 2) * 0.01;
       }
 
-      // orb bob + collision
+      // coin bob + collision
       orbs.forEach(orb => {
         if(orb.userData.collected) return;
         orb.position.y = 0.55 + Math.sin(t * 1.6 + orb.userData.bobOff) * 0.12;
         orb.rotation.y += 0.02;
         const dist = Math.hypot(orb.position.x - character.position.x, orb.position.z - character.position.z);
         if(dist < 0.45) collectOrb(orb);
+      });
+
+      // portal proximity trigger (enter/exit edge-detected so it fires once per pass)
+      portals.forEach(portal => {
+        portal.userData.ring.rotation.z += 0.008;
+        const dist = Math.hypot(portal.position.x - character.position.x, portal.position.z - character.position.z);
+        const inside = dist < 0.85;
+        if(inside && !portal.userData.wasInside){
+          portal.userData.wasInside = true;
+          spawnToast('→ ' + portal.userData.label);
+          pulseAmount(0.022, 500);
+          portal.userData.action();
+        } else if(!inside){
+          portal.userData.wasInside = false;
+        }
       });
 
       // chase camera

@@ -10,6 +10,13 @@
 </head>
 <body>
 
+<div class="scoreboard" id="scoreboard">
+  <span class="sb-item"><span class="sb-coin">🪙</span> <span id="sb-count">0</span>/<span id="sb-total">14</span></span>
+  <button class="sb-btn" id="music-toggle" type="button">♪ MUSIC: OFF</button>
+  <button class="sb-btn" id="theme-toggle" type="button">☾ DARK</button>
+  <button class="sb-btn sb-home" id="home-jump" type="button">⌂ HOME</button>
+</div>
+
 <canvas id="bg-canvas"></canvas>
 
 <div class="shell">
@@ -24,7 +31,7 @@
       <a class="navlink" data-target="log" href="#log">Log</a>
       <a class="navlink" data-target="contact" href="#contact">Contact</a>
     </nav>
-    <div class="foot-mark">v1.0</div>
+    <div class="foot-mark">v1.4</div>
   </aside>
 
   <!-- Mobile topbar -->
@@ -67,11 +74,11 @@
           <div class="vp-corner bl"></div>
           <div class="vp-corner br"></div>
           <div class="vp-hud top-left">LVL_01 // PORTFOLIO.EXE<br><span class="dim" id="hud-hint">WASD / ARROWS TO MOVE</span></div>
-          <div class="vp-hud top-right">PTS: <span id="hud-score">0</span>/<span id="hud-total">6</span></div>
+          <div class="vp-hud top-right">PTS: <span id="hud-score">0</span>/<span id="hud-total">14</span></div>
           <div class="vp-dots" id="vp-dots"></div>
           <div class="vp-toast-layer" id="vp-toast-layer"></div>
           <div class="vp-complete glitch" id="vp-complete" data-text="PORTFOLIO UNLOCKED!">PORTFOLIO UNLOCKED!</div>
-          <div class="vp-drag-hint" id="vp-drag-hint">walk into the orbs to collect skills</div>
+          <div class="vp-drag-hint" id="vp-drag-hint">collect coins · walk through a portal to jump sections</div>
           <div class="vp-scanline"></div>
           <div class="joystick" id="joystick">
             <div class="joystick-nub" id="joystick-nub"></div>
@@ -236,20 +243,21 @@
         <p style="color:var(--text-muted);margin-top:.8rem;max-width:52ch;">Open to internships, freelance work, and full-time Unity/Unreal roles. Send a message and I'll get back to you.</p>
 
         <div class="contact-grid">
-          <form onsubmit="return false;">
+          <form id="contact-form">
             <div class="field">
               <label for="name">Name</label>
-              <input id="name" type="text" placeholder="Your name">
+              <input id="name" name="name" type="text" placeholder="Your name" required>
             </div>
             <div class="field">
               <label for="email">Email</label>
-              <input id="email" type="email" placeholder="you@example.com">
+              <input id="email" name="email" type="email" placeholder="you@example.com" required>
             </div>
             <div class="field">
               <label for="message">Message</label>
-              <textarea id="message" rows="5" placeholder="Tell me about the project or role..."></textarea>
+              <textarea id="message" name="message" rows="5" placeholder="Tell me about the project or role..." required></textarea>
             </div>
             <button class="btn btn-primary" type="submit">Send Message</button>
+            <p class="form-note" id="form-note">Opens your email app, addressed to me, with this filled in.</p>
           </form>
 
           <div class="links-panel">

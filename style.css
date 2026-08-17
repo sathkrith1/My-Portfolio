@@ -14,7 +14,25 @@
     --font-body:'Inter', sans-serif;
     --font-mono:'JetBrains Mono', monospace;
     --sidebar-w:88px;
+    --sb-h:38px;
   }
+
+  html.light-theme{
+    --bg:#f2efe9;
+    --panel:#ffffff;
+    --panel-2:#f7f5f1;
+    --grid-line:#e3e0d8;
+    --border:#dcd8d0;
+    --text:#181a1d;
+    --text-muted:#5b5f66;
+    --accent:#1f9c57;
+    --accent-dim:#17753f;
+    --amber:#c96a1f;
+  }
+  html.light-theme #bg-canvas{opacity:.22;}
+  html.light-theme .thumb-inprogress{background:repeating-linear-gradient(45deg, #f7f5f1, #f7f5f1 10px, #eeece5 10px, #eeece5 20px);}
+  html.light-theme .sidebar,
+  html.light-theme .topbar{background:rgba(255,255,255,.82);}
 
   *{margin:0;padding:0;box-sizing:border-box;}
 
@@ -26,12 +44,53 @@
     font-family:var(--font-body);
     line-height:1.6;
     overflow-x:hidden;
+    padding-top:var(--sb-h);
     background-image:
       linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size:64px 64px;
     background-position:center;
+    transition:background-color .3s, color .3s;
   }
+
+  /* ---------- Top scoreboard ---------- */
+  .scoreboard{
+    position:fixed;
+    top:0;left:0;right:0;
+    height:var(--sb-h);
+    z-index:200;
+    display:flex;
+    align-items:center;
+    gap:1.4rem;
+    padding:0 1.2rem;
+    background:rgba(11,13,16,.85);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--border);
+    font-family:var(--font-mono);
+    font-size:.72rem;
+    letter-spacing:.04em;
+    color:var(--text);
+  }
+  html.light-theme .scoreboard{background:rgba(255,255,255,.85);}
+  .sb-item{display:flex;align-items:center;gap:.4rem;color:var(--accent);}
+  .sb-coin{font-size:.9rem;}
+  .sb-btn{
+    margin-left:auto;
+    background:transparent;
+    border:1px solid var(--border);
+    color:var(--text-muted);
+    font-family:var(--font-mono);
+    font-size:.66rem;
+    letter-spacing:.05em;
+    padding:.32rem .6rem;
+    border-radius:3px;
+    cursor:pointer;
+    transition:border-color .2s, color .2s;
+  }
+  .sb-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .sb-btn:first-of-type{margin-left:auto;}
+  .sb-btn + .sb-btn{margin-left:.5rem;}
+  .sb-home{color:var(--amber);border-color:var(--amber);}
 
   ::selection{background:var(--accent);color:#0b0d10;}
 
@@ -85,7 +144,7 @@
     background:rgba(20,23,28,.6);
     backdrop-filter:blur(6px);
     position:fixed;
-    top:0;left:0;bottom:0;
+    top:var(--sb-h);left:0;bottom:0;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -609,7 +668,7 @@
       display:flex;
       flex-wrap:wrap;
       row-gap:.7rem;
-      position:sticky;top:0;
+      position:sticky;top:var(--sb-h);
       z-index:100;
       align-items:center;
       justify-content:space-between;
@@ -655,6 +714,19 @@
   /* Turn off the ambient 3D background on the smallest/lowest-power devices */
   @media (max-width:480px){
     #bg-canvas{display:none;}
+  }
+
+  /* Scoreboard: compact on small screens */
+  @media (max-width:560px){
+    .scoreboard{gap:.6rem;padding:0 .7rem;font-size:.62rem;}
+    .sb-btn{padding:.26rem .45rem;font-size:.58rem;}
+  }
+
+  .form-note{
+    font-family:var(--font-mono);
+    font-size:.68rem;
+    color:var(--text-muted);
+    margin-top:.8rem;
   }
 
   @media (prefers-reduced-motion: reduce){
