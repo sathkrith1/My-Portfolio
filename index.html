@@ -4,283 +4,189 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sathkrith Gaur — Game Developer</title>
+<meta name="description" content="Sathkrith Gaur — Game Developer. Unreal Engine 5, Unity/C#, and Blueprints.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="scoreboard" id="scoreboard">
-  <span class="sb-item"><span class="sb-coin">🪙</span> <span id="sb-count">0</span>/<span id="sb-total">14</span></span>
-  <button class="sb-btn" id="music-toggle" type="button">♪ MUSIC: OFF</button>
-  <button class="sb-btn" id="theme-toggle" type="button">☾ DARK</button>
-  <button class="sb-btn sb-home" id="home-jump" type="button">⌂ HOME</button>
-</div>
+<header class="topbar">
+  <a class="mark" href="#top">Sathkrith Gaur<span class="mark-dot">.</span></a>
 
-<canvas id="bg-canvas"></canvas>
+  <nav class="topnav">
+    <a href="#work">Work</a>
+    <a href="#contact">Contact</a>
+  </nav>
 
-<div class="shell">
-
-  <!-- Desktop sidebar -->
-  <aside class="sidebar">
-    <div class="logo">&lt;/&gt;</div>
-    <nav>
-      <a class="navlink active" data-target="home" href="#home">Home</a>
-      <a class="navlink" data-target="skills" href="#skills">Skills</a>
-      <a class="navlink" data-target="projects" href="#projects">Projects</a>
-      <a class="navlink" data-target="log" href="#log">Log</a>
-      <a class="navlink" data-target="contact" href="#contact">Contact</a>
-    </nav>
-    <div class="foot-mark">v1.4</div>
-  </aside>
-
-  <!-- Mobile topbar -->
-  <div class="topbar">
-    <div class="logo">&lt;/&gt;</div>
-    <nav>
-      <a class="navlink active" data-target="home" href="#home">Home</a>
-      <a class="navlink" data-target="skills" href="#skills">Skills</a>
-      <a class="navlink" data-target="projects" href="#projects">Projects</a>
-      <a class="navlink" data-target="log" href="#log">Log</a>
-      <a class="navlink" data-target="contact" href="#contact">Contact</a>
-    </nav>
+  <div class="controls">
+    <button class="ctrl-btn" id="theme-toggle" type="button">Theme<span class="ctrl-tag" id="theme-tag">[dark]</span></button>
+    <button class="ctrl-btn" id="sound-toggle" type="button">Sound<span class="ctrl-tag" id="sound-tag">[off]</span></button>
+    <div class="clock mono" id="clock">--:-- <span class="clock-zone">GMT+5:30 IN</span></div>
   </div>
+</header>
 
-  <main>
+<main>
 
-    <!-- HERO -->
-    <section id="home">
-      <div class="section-inner hero-grid">
-        <div class="hero">
-          <div class="eyebrow">Build: Portfolio_v1.3 // Status: Playable</div>
-          <h1>Sathkrith Gaur<br>Systems that move. Worlds that <span class="accent glitch-flicker">react.</span></h1>
-          <div class="role-row">
-            <span class="role-chip">Game Developer</span>
-            <span class="role-chip">Web Developer</span>
-            <span class="role-chip">Application Developer</span>
-          </div>
-          <p class="lead">I build gameplay systems, enemy AI, combat feel, and interactive experiences — using Unreal Engine 5, Unity/C#, and Blueprints — with a working foundation in web and application development to match.</p>
-          <div class="meta-row mono">📍 Hyderabad, Telangana &nbsp;·&nbsp; +91 99894 91154 &nbsp;·&nbsp; sathkrith0@gmail.com</div>
-          <div class="btn-row">
-            <a href="#projects" class="btn btn-primary">View Projects</a>
-            <a href="resume.pdf" class="btn btn-ghost" target="_blank">Download Resume</a>
-            <a href="#contact" class="btn btn-ghost">Get In Touch</a>
-          </div>
-        </div>
+  <!-- HERO -->
+  <section class="hero reveal" id="top">
+    <p class="eyebrow">Game Development &amp; Engineering</p>
+    <h1>Systems that move.<br>Designed with care.</h1>
+    <p class="lead">I'm Sathkrith Gaur, building gameplay systems, combat feel, and interactive experiences in Unreal&nbsp;Engine&nbsp;5, Unity/C#, and Blueprints.</p>
+    <p class="lead-sub">I'm building a solo Unity project from scratch, and previously trained at <a href="#log">Backstage Pass Institute of Gaming</a>, shipping <a href="#work">Survival Horror</a>, <a href="#work">Kart Racer</a>, and <a href="#work">Jodu The Fighter</a>.</p>
+    <div class="hero-links">
+      <a href="resume.pdf" target="_blank">Resume <span class="arrow">↗</span></a>
+      <a href="https://github.com/sathkrith1" target="_blank" rel="noopener">GitHub <span class="arrow">↗</span></a>
+      <a href="https://www.linkedin.com/in/sathkrith-gaur" target="_blank" rel="noopener">LinkedIn <span class="arrow">↗</span></a>
+    </div>
+  </section>
 
-        <div class="viewport" id="viewport">
-          <div class="vp-corner tl"></div>
-          <div class="vp-corner tr"></div>
-          <div class="vp-corner bl"></div>
-          <div class="vp-corner br"></div>
-          <div class="vp-hud top-left">LVL_01 // PORTFOLIO.EXE<br><span class="dim" id="hud-hint">WASD / ARROWS TO MOVE</span></div>
-          <div class="vp-hud top-right">PTS: <span id="hud-score">0</span>/<span id="hud-total">14</span></div>
-          <div class="vp-dots" id="vp-dots"></div>
-          <div class="vp-toast-layer" id="vp-toast-layer"></div>
-          <div class="vp-complete glitch" id="vp-complete" data-text="PORTFOLIO UNLOCKED!">PORTFOLIO UNLOCKED!</div>
-          <div class="vp-drag-hint" id="vp-drag-hint">collect coins · walk through a portal to jump sections</div>
-          <div class="vp-scanline"></div>
-          <div class="joystick" id="joystick">
-            <div class="joystick-nub" id="joystick-nub"></div>
-          </div>
-        </div>
+  <!-- PHILOSOPHY -->
+  <section class="philosophy reveal">
+    <h2 class="philosophy-heading">I bring <span class="accent-text">systems thinking</span> to gameplay</h2>
+    <p class="philosophy-body">I care about how mechanics, AI, and animation talk to each other — not just whether a feature works, but whether it feels right in the player's hands. That's as true in a combat montage as it is in the code behind a UI screen.</p>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="skills reveal" id="skills">
+    <p class="section-label">01 — Skillset</p>
+    <div class="skill-rows">
+      <div class="skill-row">
+        <span class="skill-group">Engines</span>
+        <span class="skill-items">Unreal Engine 5, Unity</span>
       </div>
-    </section>
-
-    <!-- SKILLS -->
-    <section id="skills">
-      <div class="section-inner">
-        <div class="eyebrow">Inspector // Components</div>
-        <h2>Core Skillset</h2>
-
-        <div class="skills-grid">
-          <div class="skill-card"><div class="grp">Engine</div><h3>Unreal Engine 5</h3></div>
-          <div class="skill-card"><div class="grp">Engine</div><h3>Unity</h3></div>
-          <div class="skill-card"><div class="grp">Language</div><h3>C#</h3></div>
-          <div class="skill-card"><div class="grp">Language</div><h3>Unreal Engine C++</h3></div>
-          <div class="skill-card"><div class="grp">Visual Scripting</div><h3>Blueprint Scripting</h3></div>
-          <div class="skill-card"><div class="grp">Gameplay</div><h3>Enemy AI &amp; NavMesh</h3></div>
-          <div class="skill-card"><div class="grp">Gameplay</div><h3>Combat Systems</h3></div>
-          <div class="skill-card"><div class="grp">Gameplay</div><h3>Vehicle &amp; Physics</h3></div>
-          <div class="skill-card"><div class="grp">Animation</div><h3>Animation Blueprints</h3></div>
-          <div class="skill-card"><div class="grp">Animation</div><h3>State Machines &amp; Montages</h3></div>
-          <div class="skill-card"><div class="grp">Systems</div><h3>UI Development (UMG)</h3></div>
-          <div class="skill-card"><div class="grp">Systems</div><h3>Prefab Architecture</h3></div>
-          <div class="skill-card"><div class="grp">Web Dev</div><h3>HTML / CSS / JavaScript</h3></div>
-          <div class="skill-card"><div class="grp">Web Dev</div><h3>Three.js / WebGL</h3></div>
-          <div class="skill-card"><div class="grp">App Dev</div><h3>Computer Applications (BCA)</h3></div>
-          <div class="skill-card"><div class="grp">Tools</div><h3>Git &amp; GitHub</h3></div>
-          <div class="skill-card"><div class="grp">Tools</div><h3>Visual Studio 2022</h3></div>
-          <div class="skill-card"><div class="grp">Tools</div><h3>Blender</h3></div>
-        </div>
+      <div class="skill-row">
+        <span class="skill-group">Languages</span>
+        <span class="skill-items">C#, Unreal Engine C++, Blueprint Scripting</span>
       </div>
-    </section>
-
-    <!-- PROJECTS -->
-    <section id="projects">
-      <div class="section-inner">
-        <div class="eyebrow">Scenes // Loaded</div>
-        <h2>Selected Projects</h2>
-
-        <div class="project-grid">
-
-          <div class="project-card">
-            <div class="thumb thumb-horror">
-              <span class="badge engine">Unreal Engine</span>
-            </div>
-            <div class="project-body">
-              <h3>Survival Horror</h3>
-              <p>An AI-driven horror experience — enemy detection, dynamic chase sequences, and a full combat and health system built around tension and pacing.</p>
-              <div class="tag-row">
-                <span class="tag">AI Behavior</span>
-                <span class="tag">Detection</span>
-                <span class="tag">Combat</span>
-                <span class="tag">Health System</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-card">
-            <div class="thumb thumb-kart">
-              <span class="badge engine">Unity</span>
-            </div>
-            <div class="project-body">
-              <h3>Kart Racer</h3>
-              <p>An arcade-style kart racing game built from the ground up — custom vehicle physics, drift mechanics, and movement tuned for responsive, satisfying handling.</p>
-              <div class="tag-row">
-                <span class="tag">Vehicle Physics</span>
-                <span class="tag">Drift Mechanics</span>
-                <span class="tag">Movement</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-card">
-            <div class="thumb thumb-fighter">
-              <span class="badge engine">Unreal Engine</span>
-            </div>
-            <div class="project-body">
-              <h3>Jodu The Fighter</h3>
-              <p>A combat-focused fighting game prototype with combo-driven attacks and hand-tuned animation blending for readable, impactful hits.</p>
-              <div class="tag-row">
-                <span class="tag">Combat Design</span>
-                <span class="tag">Animation</span>
-                <span class="tag">Hit Reactions</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="project-card">
-            <div class="thumb thumb-inprogress">
-              <span class="badge dev">In Development</span>
-            </div>
-            <div class="project-body">
-              <h3>Untitled Unity Project</h3>
-              <p>A larger solo-built Unity project — player movement, collisions, level design, prefab architecture, and a full player customization system with unlockable skins and gear.</p>
-              <div class="tag-row">
-                <span class="tag">Customization / UI</span>
-                <span class="tag">Prefabs</span>
-                <span class="tag">C# Systems</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
+      <div class="skill-row">
+        <span class="skill-group">Gameplay</span>
+        <span class="skill-items">Enemy AI &amp; NavMesh, Combat Systems, Animation Blueprints, State Machines &amp; Montages</span>
       </div>
-    </section>
-
-    <!-- BUILD LOG -->
-    <section id="log">
-      <div class="section-inner">
-        <div class="eyebrow">Build Log // Chronological</div>
-        <h2>Path So Far</h2>
-
-        <div class="log">
-          <div class="log-entry">
-            <span class="log-tag mono">v1.0</span>
-            <h3>Bachelor of Computer Applications</h3>
-            <p>CMS Degree College, 2021 – 2025. Built a foundation in computer applications, business fundamentals, and analytical thinking.</p>
-          </div>
-          <div class="log-entry">
-            <span class="log-tag mono">v1.1</span>
-            <h3>Advanced Diploma in Game Development</h3>
-            <p>Backstage Pass Institute of Gaming, 2025 – 2026. Trained in Unreal Engine 5, Blueprints, and C++ fundamentals with hands-on prototyping.</p>
-          </div>
-          <div class="log-entry">
-            <span class="log-tag mono">v1.2</span>
-            <h3>Game Developer — Backstage Pass Institute of Gaming</h3>
-            <p>Jan 2025 – Jan 2026. Built enemy AI and animation systems, sword combat tied to Animation Blueprints/montages, and core gameplay prototypes using Blueprint scripting and UMG.</p>
-          </div>
-          <div class="log-entry">
-            <span class="log-tag mono">v1.3</span>
-            <h3>Shipped 3 portfolio projects</h3>
-            <p>Survival Horror, Kart Racer, and Jodu The Fighter — built end-to-end.</p>
-          </div>
-          <div class="log-entry">
-            <span class="log-tag mono">v1.4</span>
-            <h3>Started a larger solo Unity project</h3>
-            <p>Building every system from scratch: movement, collisions, level design, UI, and customization.</p>
-          </div>
-          <div class="log-entry">
-            <span class="log-tag mono">v1.5</span>
-            <h3>Currently leveling up</h3>
-            <p>Taking a Unity Engine course to deepen engine-level knowledge.</p>
-          </div>
-          <div class="log-entry">
-            <span class="log-tag mono">v1.6</span>
-            <h3>Core Game Developer Intern — offer received</h3>
-            <p>Remote Unity/C# internship on <em>Temple of Causality: Reincarnation</em>.</p>
-          </div>
-        </div>
+      <div class="skill-row">
+        <span class="skill-group">Systems</span>
+        <span class="skill-items">UI Development (UMG), Prefab Architecture</span>
       </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact">
-      <div class="section-inner">
-        <div class="eyebrow">Export Build</div>
-        <h2>Let's Build Something</h2>
-        <p style="color:var(--text-muted);margin-top:.8rem;max-width:52ch;">Open to internships, freelance work, and full-time Unity/Unreal roles. Send a message and I'll get back to you.</p>
-
-        <div class="contact-grid">
-          <form id="contact-form">
-            <div class="field">
-              <label for="name">Name</label>
-              <input id="name" name="name" type="text" placeholder="Your name" required>
-            </div>
-            <div class="field">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" placeholder="you@example.com" required>
-            </div>
-            <div class="field">
-              <label for="message">Message</label>
-              <textarea id="message" name="message" rows="5" placeholder="Tell me about the project or role..." required></textarea>
-            </div>
-            <button class="btn btn-primary" type="submit">Send Message</button>
-            <p class="form-note" id="form-note">Opens your email app, addressed to me, with this filled in.</p>
-          </form>
-
-          <div class="links-panel">
-            <div class="eyebrow">Direct Links</div>
-            <a class="link-item" href="https://github.com/sathkrith1" target="_blank" rel="noopener"><span>GitHub</span><span class="arrow">&rarr;</span></a>
-            <a class="link-item" href="https://www.linkedin.com/in/sathkrith-gaur" target="_blank" rel="noopener"><span>LinkedIn</span><span class="arrow">&rarr;</span></a>
-            <a class="link-item" href="mailto:sathkrith0@gmail.com"><span>Email</span><span class="arrow">&rarr;</span></a>
-            <a class="link-item" href="tel:+919989491154"><span>Phone</span><span class="arrow">&rarr;</span></a>
-            <a class="link-item" href="resume.pdf" target="_blank"><span>Resume (PDF)</span><span class="arrow">&rarr;</span></a>
-          </div>
-        </div>
+      <div class="skill-row">
+        <span class="skill-group">Web &amp; App</span>
+        <span class="skill-items">HTML, CSS, JavaScript, Computer Applications (BCA)</span>
       </div>
-    </section>
+      <div class="skill-row">
+        <span class="skill-group">Tools</span>
+        <span class="skill-items">Git &amp; GitHub, Visual Studio 2022, Blender</span>
+      </div>
+    </div>
+  </section>
 
-  </main>
-</div>
+  <!-- WORK -->
+  <section class="work reveal" id="work">
+    <p class="section-label">02 — Selected Work</p>
+    <div class="work-list">
+      <div class="work-row">
+        <div class="work-row-top">
+          <span class="work-title">Survival Horror</span>
+          <span class="work-year">Unreal Engine</span>
+        </div>
+        <p class="work-desc">An AI-driven horror experience — enemy detection, dynamic chase sequences, and a full combat and health system built around tension and pacing.</p>
+      </div>
+      <div class="work-row">
+        <div class="work-row-top">
+          <span class="work-title">Kart Racer</span>
+          <span class="work-year">Unity</span>
+        </div>
+        <p class="work-desc">An arcade-style kart racing game built from the ground up — custom vehicle physics, drift mechanics, and movement tuned for responsive handling.</p>
+      </div>
+      <div class="work-row">
+        <div class="work-row-top">
+          <span class="work-title">Jodu The Fighter</span>
+          <span class="work-year">Unreal Engine</span>
+        </div>
+        <p class="work-desc">A combat-focused fighting prototype with combo-driven attacks and hand-tuned animation blending for readable, impactful hits.</p>
+      </div>
+      <div class="work-row">
+        <div class="work-row-top">
+          <span class="work-title">Untitled Unity Project</span>
+          <span class="work-year">In development</span>
+        </div>
+        <p class="work-desc">A larger solo-built Unity project — movement, collisions, level design, prefab architecture, and a full player customization system.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG -->
+  <section class="log reveal" id="log">
+    <p class="section-label">03 — Path So Far</p>
+    <div class="log-list">
+      <div class="log-row">
+        <span class="log-year mono">2021–2025</span>
+        <span class="log-text">Bachelor of Computer Applications — CMS Degree College</span>
+      </div>
+      <div class="log-row">
+        <span class="log-year mono">2025–2026</span>
+        <span class="log-text">Advanced Diploma in Game Development — Backstage Pass Institute of Gaming. Trained in Unreal Engine 5, Blueprints, and C++.</span>
+      </div>
+      <div class="log-row">
+        <span class="log-year mono">Jan 2025–Jan 2026</span>
+        <span class="log-text">Game Developer — Backstage Pass Institute of Gaming. Enemy AI/animation systems, combat tied to Animation Blueprints, gameplay prototypes.</span>
+      </div>
+      <div class="log-row">
+        <span class="log-year mono">Ongoing</span>
+        <span class="log-text">Taking a Unity Engine course to deepen engine-level knowledge, alongside a larger solo project.</span>
+      </div>
+      <div class="log-row">
+        <span class="log-year mono">Offer</span>
+        <span class="log-text">Core Game Developer Intern (Unity/C#) — remote, on <em>Temple of Causality: Reincarnation</em>.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATEMENT -->
+  <section class="statement reveal">
+    <p class="statement-text">Build.<br>Ship.<br>Iterate.</p>
+  </section>
+
+  <!-- CONTACT / CTA -->
+  <section class="cta reveal" id="contact">
+    <p class="section-label">04 — Contact</p>
+    <h2 class="cta-heading">Let's<br>build<br>something<br>great</h2>
+
+    <div class="cta-grid">
+      <form id="contact-form">
+        <div class="field">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Your name" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="4" placeholder="Tell me about the project or role..." required></textarea>
+        </div>
+        <button class="submit-btn" type="submit">Send Message</button>
+        <p class="form-note">Opens your email app, addressed to me, with this filled in.</p>
+      </form>
+
+      <div class="cta-meta">
+        <a class="cta-email" href="mailto:sathkrith0@gmail.com">sathkrith0@gmail.com</a>
+        <div class="cta-links">
+          <a href="https://github.com/sathkrith1" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.linkedin.com/in/sathkrith-gaur" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="tel:+919989491154">+91 99894 91154</a>
+        </div>
+        <p class="cta-location">Hyderabad, Telangana, India</p>
+      </div>
+    </div>
+  </section>
+
+</main>
 
 <footer>
-  <span>© 2026 Sathkrith Gaur — All systems operational.</span>
-  <span>Compiled with: HTML · CSS · JS · Three.js</span>
+  <span>© 2026 Sathkrith Gaur</span>
+  <span>Built with HTML · CSS · JavaScript</span>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
